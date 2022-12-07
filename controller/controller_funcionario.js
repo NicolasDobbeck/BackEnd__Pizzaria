@@ -14,7 +14,6 @@ const novoFuncionario = async function (funcionario) {
 
     //Validacao de campos obrigatórios
     if (funcionario.nome == '' || funcionario.nome == undefined || funcionario.email == '' || funcionario.email == undefined || funcionario.senha == '' || funcionario.senha == undefined || funcionario.telefone == '' || funcionario.telefone == undefined){
-        console.log(funcionario);
         return { status: 400, message: MESSAGE_ERROR.REQUIRED_FIELDS };
     }    
     
