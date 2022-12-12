@@ -319,6 +319,7 @@ app.get('/v1/pizza/:id', cors(), async function (request, response) {
 });
 
 
+
 // ---------- EndPoint para listar todas as pizzas existentes no BD---------- //
 app.get('/v1/pizzas', cors(), async function (request, response) {
 
@@ -430,6 +431,358 @@ app.delete('/v1/pizza/:id', cors(),jsonParser, async function(request, response)
     response.json(message);
 
 });
+
+// ***************** // ---------- EndPoints de Tamanho de Pizza---------- // *****************
+
+// ---------- EndPoint para inserir novo tamanho pizza ---------- //
+app.post('/v1/tamanhoPizza', cors(), jsonParser, async function (request, response) {
+    let statusCode;
+    let message;
+    let headerContentType;
+
+    //Reccebe o tipo de content-type que foi enviado no header da requisicao
+    //application/json
+    headerContentType = request.headers['content-type'];
+
+    //Validar se o content-type é do tipo application/json
+    if (headerContentType == 'application/json') {
+        //Recebe do corpo da mensagem o conteudo
+        let dadosBody = request.body;
+
+        //Realiza um processo de conversao de dados para conseguir comparar o json vazio
+        if (JSON.stringify(dadosBody) != '{}') {
+            //imnport do arquivo da controller de tamanho pizza
+            const controllerTamanhoPizza = require('./controller/controller_tamanhoPizza.js');
+            //Chama a funcao novoTamanhoPizza da controller e encaminha os dados do body 
+            const novoTamanhoPizza = await controllerTamanhoPizza.novoTamanhoPizza(dadosBody)
+            statusCode = novoTamanhoPizza.status;
+            message = novoTamanhoPizza.message;
+
+        } else {
+            statusCode = 400;
+            message = MESSAGE_ERROR.EMPTY_BODY;
+        }
+
+    } else {
+        statusCode = 415;
+        message = MESSAGE_ERROR.CONTENT_TYPE;
+    }
+
+    response.status(statusCode);
+    response.json(message);
+
+
+});
+
+// ---------- EndPoint para buscar tamanho de pizza pelo ID---------- //
+app.get('/v1/tamanhoPizza/:id', cors(), async function (request, response) {
+
+    let statusCode;
+    let message;
+    let id = request.params.id;
+
+    //Validação do ID na requisição
+    if (id != '' && id != undefined) {
+        //import do arquivo controllerPizza
+        const controllerTamanhoPizza = require('./controller/controller_tamanhoPizza.js');
+
+        //Retorna todos as pizzas existentes no BD
+        const dadosTamanhoPizza = await controllerTamanhoPizza.buscarTamanhoPizza(id);
+
+        //Valida se existe retorno de dados
+        if (dadosTamanhoPizza) {   //Status 200
+            statusCode = 200;
+            message = dadosPizza;
+        } else {
+            //Status 404
+            statusCode = 404;
+            message = MESSAGE_ERROR.NOT_FOUND_DB
+        }
+    } else {
+        statusCode = 400;
+        message = MESSAGE_ERROR.REQUIRED_ID;
+    }
+
+    //Retorna os dados da API
+    response.status(statusCode);
+    response.json(message);
+
+});
+
+
+
+// ---------- EndPoint para listar todas as pizzas existentes no BD---------- //
+app.get('/v1/tamanhoPizzas', cors(), async function (request, response) {
+
+    let statusCode;
+    let message;
+
+    //import do arquivo controllerPizza
+    const controllerTamanhoPizza = require('./controller/controller_tamanhoPizza.js');
+
+    //Retorna todos os pizzas existentes no BD
+    const dadosTamanhoPizza = await controllerTamanhoPizza.listarTamanhosPizza();
+
+    //Valida se existe retorno de dados
+    if (dadosTamanhoPizza) {   //Status 200
+        statusCode = 200;
+        message = dadosPizza;
+    } else {
+        //Status 404
+        statusCode = 404;
+        message = MESSAGE_ERROR.NOT_FOUND_DB
+    }
+    //console.log(message);
+    //Retorna os dados da API
+    response.status(statusCode);
+    response.json(message);
+
+});
+
+
+
+// ---------- EndPoint para atualizar uma pizza pelo ID---------- //
+app.put('/v1/tamanhoPizza/:id', cors(), jsonParser, async function(request, response){
+    let statusCode;
+    let message;
+    let headerContentType;
+
+    //Reccebe o tipo de content-type que foi enviado no header da requisicao
+        //application/json
+    headerContentType = request.headers['content-type'];
+
+    //Validar se o content-type é do tipo application/json
+    if (headerContentType == 'application/json'){
+        //Recebe do corpo da mensagem o conteudo
+        let dadosBody = request.body;
+
+        //Realiza um processo de conversao de dados para conseguir comparar o json vazio
+        if (JSON.stringify(dadosBody) != '{}')
+        {
+            //Recebe o id enviado por parametro na requisição
+            let id = request.params.id;
+            
+            //Validação do ID na requisição
+            if (id != '' && id != undefined)
+            {
+                //Adiciona o id no JSON que chegou do corpo da requisição
+                dadosBody.id = id;
+                //imnport do arquivo da controller de pizza
+                const controllerTamanhoPizza = require('./controller/controller_tamanhoPizza.js');
+                //Chama a funcao novaPizza da controller e encaminha os dados do body 
+                const novoTamanhoPizza = await controllerTamanhoPizza.atualizarTamanhoPizza(dadosBody);
+                
+                statusCode = novoTamanhoPizza.status;
+                message = novoTamanhoPizza.message;
+            }else{
+                statusCode = 400;
+                message = MESSAGE_ERROR.REQUIRED_ID;
+            }
+
+            
+        }else{
+            statusCode = 400;
+            message = MESSAGE_ERROR.EMPTY_BODY;
+        }
+
+    }else{
+        statusCode = 415;
+        message = MESSAGE_ERROR.CONTENT_TYPE;
+    }
+
+    response.status(statusCode);
+    response.json(message);
+
+});
+
+
+
+// ---------- EndPoint para excluir tamanho existente---------- //
+app.delete('/v1/tamanhoPizza/:id', cors(),jsonParser, async function(request, response){
+    let statusCode;
+    let message;
+    let id = request.params.id;
+    
+    //Validação do ID na requisição
+    if (id !== '' && id !== undefined){
+        //import do arquivo da controller de pizza
+        const controllerTamanhoPizza = require('./controller/controller_tamanhoPizza.js');
+        
+        //Chama a funcao para excluir um item 
+        const pizza = await controllerTamanhoPizza.excluirTamanhoPizza(id);
+
+        statusCode = pizza.status;
+        message = pizza.message;
+
+    }else{
+        statusCode = 400;
+        message = MESSAGE_ERROR.REQUIRED_ID;
+    }
+
+    response.status(statusCode);
+    response.json(message);
+
+});
+
+
+
+// ***************** // ---------- EndPoints de Ingredientes ---------- // *****************
+
+// ---------- EndPoint para inserir novo ingrediente ---------- //
+app.post('/v1/ingrediente', cors(), jsonParser, async function (request, response) {
+    let statusCode;
+    let message;
+    let headerContentType;
+
+    //Reccebe o tipo de content-type que foi enviado no header da requisicao
+    //application/json
+    headerContentType = request.headers['content-type'];
+
+    //Validar se o content-type é do tipo application/json
+    if (headerContentType == 'application/json') {
+        //Recebe do corpo da mensagem o conteudo
+        let dadosBody = request.body;
+
+        //Realiza um processo de conversao de dados para conseguir comparar o json vazio
+        if (JSON.stringify(dadosBody) != '{}') {
+            //imnport do arquivo da controller de tamanho pizza
+            const controllerIngrediente = require('./controller/controller_ingredientes.js');
+            //Chama a funcao novoTamanhoPizza da controller e encaminha os dados do body 
+            const novoIngrediente = await controllerIngrediente.novoIngrediente(dadosBody)
+            statusCode = novoIngrediente.status;
+            message = novoIngrediente.message;
+
+        } else {
+            statusCode = 400;
+            message = MESSAGE_ERROR.EMPTY_BODY;
+        }
+
+    } else {
+        statusCode = 415;
+        message = MESSAGE_ERROR.CONTENT_TYPE;
+    }
+
+    response.status(statusCode);
+    response.json(message);
+
+
+});
+
+
+
+// ---------- EndPoint para listar todos os ingredientes existentes no BD---------- //
+app.get('/v1/ingredientes', cors(), async function (request, response) {
+
+    let statusCode;
+    let message;
+
+    //import do arquivo controllerPizza
+    const controllerIngrediente = require('./controller/controller_ingredientes.js');
+
+    //Retorna todos os pizzas existentes no BD
+    const dadosIngrediente = await controllerIngrediente.listarIngrediente();
+
+    //Valida se existe retorno de dados
+    if (dadosIngrediente) {   //Status 200
+        statusCode = 200;
+        message = dadosPizza;
+    } else {
+        //Status 404
+        statusCode = 404;
+        message = MESSAGE_ERROR.NOT_FOUND_DB
+    }
+    //console.log(message);
+    //Retorna os dados da API
+    response.status(statusCode);
+    response.json(message);
+
+});
+
+
+
+// ---------- EndPoint para atualizar uma pizza pelo ID---------- //
+app.put('/v1/ingrediente/:id', cors(), jsonParser, async function(request, response){
+    let statusCode;
+    let message;
+    let headerContentType;
+
+    //Reccebe o tipo de content-type que foi enviado no header da requisicao
+        //application/json
+    headerContentType = request.headers['content-type'];
+
+    //Validar se o content-type é do tipo application/json
+    if (headerContentType == 'application/json'){
+        //Recebe do corpo da mensagem o conteudo
+        let dadosBody = request.body;
+
+        //Realiza um processo de conversao de dados para conseguir comparar o json vazio
+        if (JSON.stringify(dadosBody) != '{}')
+        {
+            //Recebe o id enviado por parametro na requisição
+            let id = request.params.id;
+            
+            //Validação do ID na requisição
+            if (id != '' && id != undefined)
+            {
+                //Adiciona o id no JSON que chegou do corpo da requisição
+                dadosBody.id = id;
+                //imnport do arquivo da controller de pizza
+                const controllerIngrediente = require('./controller/controller_ingredientes.js');
+                //Chama a funcao novaPizza da controller e encaminha os dados do body 
+                const novoIngrediente = await controllerIngrediente.atualizarIngrediente(dadosBody);
+                
+                statusCode = novoIngrediente.status;
+                message = novoIngrediente.message;
+            }else{
+                statusCode = 400;
+                message = MESSAGE_ERROR.REQUIRED_ID;
+            }
+
+            
+        }else{
+            statusCode = 400;
+            message = MESSAGE_ERROR.EMPTY_BODY;
+        }
+
+    }else{
+        statusCode = 415;
+        message = MESSAGE_ERROR.CONTENT_TYPE;
+    }
+
+    response.status(statusCode);
+    response.json(message);
+
+});
+
+
+
+// ---------- EndPoint para excluir tamanho existente---------- //
+app.delete('/v1/ingrediente/:id', cors(),jsonParser, async function(request, response){
+    let statusCode;
+    let message;
+    let id = request.params.id;
+    
+    //Validação do ID na requisição
+    if (id !== '' && id !== undefined){
+        //import do arquivo da controller de pizza
+        const controllerIngrediente = require('./controller/controller_ingredientes.js');
+        
+        //Chama a funcao para excluir um item 
+        const ingrediente = await controllerIngrediente.excluirIngrediente(id);
+
+        statusCode = ingrediente.status;
+        message = ingrediente.message;
+
+    }else{
+        statusCode = 400;
+        message = MESSAGE_ERROR.REQUIRED_ID;
+    }
+
+    response.status(statusCode);
+    response.json(message);
+
+});
+
 
 
 //Ativa o servidor para receber requisicoes HTTP

@@ -6,8 +6,8 @@
  * Versao: 1.0
  *********************************************************************/
 
-//Funcao para inserir um novo tamanho de pizza 
-const insertTamanhoPizza = async function (tamanhoPizza) {
+//Funcao para inserir um novo ingrediente
+const insertIngrediente = async function (ingrediente) {
     try {
         //Import da classe prismaClient, que é responsável pelas interacoes com o BD
         const { PrismaClient } = require('@prisma/client');
@@ -15,16 +15,11 @@ const insertTamanhoPizza = async function (tamanhoPizza) {
         //Instancia da classe PrismaClient
         const prisma = new PrismaClient();
 
-        let sql = `insert into tbl_tamanho_pizza (tamanho, preco)
-                                                values(
-                                                    '${tamanhoPizza.tamanho}',
-                                                    '${funcionario.preco}'
-                                                )`;
-        
+        let sql = `insert into tbl_ingredientes_pizza (ingrediente) values('${ingrediente.ingrediente}')`;
+       
         // Executa o script SQL no Banco de dados 
         //($executeRawUnsafe permite encaminhar uma variavel contendo o script)
         const result = await prisma.$executeRawUnsafe (sql);
-        // console.log(result);
 
         //Verifica se o script foi executado com sucesso no BD
         if (result)
@@ -38,8 +33,8 @@ const insertTamanhoPizza = async function (tamanhoPizza) {
 }
 
 
-//Funcao para atualizar um registro de tamanho no BD
-const updateTamanhoPizza = async function (tamanhoPizza) {
+//Funcao para atualizar um registro no BD
+const updateIngrediente = async function (ingrediente) {
     try {
 
         //Import da classe prismaClient, que é responsável pelas interacoes com o BD
@@ -48,12 +43,10 @@ const updateTamanhoPizza = async function (tamanhoPizza) {
         //Instancia da classe PrismaClient
         const prisma = new PrismaClient();
 
-        let sql = `update tbl_tamanho_pizza set tamanho       = '${tamanhoPizza.tamanho}', 
-                                                preco         = '${tamanhoPizza.preco}'
-                            where id = '${tamanhoPizza.id}'
+        let sql = `update tbl_ingredientes_pizza set ingrediente            = '${ingrediente.ingrediente}'
+                                                     where id                = '${ingrediente.id}'
                         `;
        
-        
         // Executa o script SQL no Banco de dados 
         //($executeRawUnsafe permite encaminhar uma variavel contendo o script)
         const result = await prisma.$executeRawUnsafe (sql);
@@ -71,7 +64,7 @@ const updateTamanhoPizza = async function (tamanhoPizza) {
 }
 
 //Funcao para excluir um registro no BD
-const deleteTamanhoPizza = async function (id) {
+const deleteIngrediente = async function (id) {
     try {
 
         //Import da classe prismaClient, que é responsável pelas interacoes com o BD
@@ -80,7 +73,7 @@ const deleteTamanhoPizza = async function (id) {
         //Instancia da classe PrismaClient
         const prisma = new PrismaClient();
 
-        let sql = `delete from tbl_tamanho_pizza
+        let sql = `delete from tbl_ingredientes_pizza
                             where id = '${id}'
                         `;
         // Executa o script SQL no Banco de dados 
@@ -100,7 +93,7 @@ const deleteTamanhoPizza = async function (id) {
 }
 
 //Funcao para retornar todos os registros do BD
-const selectAllTamanhoPizza = async function () {
+const selectAllIngredientes = async function () {
 
     //Import da classe prismaClient, que é responsável pelas interacoes com o BD
     const { PrismaClient } = require('@prisma/client');
@@ -108,21 +101,21 @@ const selectAllTamanhoPizza = async function () {
     //Instancia da classe PrismaClient
     const prisma = new PrismaClient();
 
-    //Criamos um objeto do tipo RecordSet (rsTamanho) para receber os dados do BD
+    //Criamos um objeto do tipo RecordSet (rspizza) para receber os dados do BD
     //através do script SQL (select)
-    const rsTamanho = await prisma.$queryRaw `select cast(id as float) as id, tamanho, preco from tbl_tamanho_pizza order by id desc`;
+    const rsIngredientes = await prisma.$queryRaw `select cast(id as float) as id, ingredientes from tbl_ingredientes_pizza order by id desc`;
 
     
 
-    if (rsTamanho.length > 0)
-        return rsTamanho;
+    if (rsIngredientes.length > 0)
+        return rsIngredientes;
     else
         return false;
 
 }
 
 //Funcao para retornar apenas o registro baseado no ID
-const selectByIdTamanhoPizza = async function (id) {
+const selectByIdIngredientes = async function (id) {
 
     //Import da classe prismaClient, que é responsável pelas interacoes com o BD
     const { PrismaClient } = require('@prisma/client');
@@ -130,28 +123,27 @@ const selectByIdTamanhoPizza = async function (id) {
     //Instancia da classe PrismaClient
     const prisma = new PrismaClient();
 
-    //Criamos um objeto do tipo RecordSet (rsTamanho) para receber os dados do BD
+    //Criamos um objeto do tipo RecordSet (rsPizzas) para receber os dados do BD
     //através do script SQL (select)
 
     let sql = `select cast(id as float) as id, 
-                    tamanho,
-                    preco
-                from tbl_tamanho_pizza
+                    ingredientes
+                from tbl_pizza
                 where id = ${id}`
 
-    const rsTamanho = await prisma.$queryRawUnsafe(sql) ;
+    const rsIngredientes = await prisma.$queryRawUnsafe(sql) ;
 
-    if (rsTamanho.length > 0)
-        return rsTamanho;
+    if (rsIngredientes.length > 0)
+        return rsIngredientes;
     else
         return false;
 
 }
 
 module.exports={
-    insertTamanhoPizza,
-    updateTamanhoPizza,
-    deleteTamanhoPizza,
-    selectAllTamanhoPizza,
-    selectByIdTamanhoPizza
+    insertIngrediente,
+    updateIngrediente,
+    deleteIngrediente,
+    selectAllIngredientes,
+    selectByIdIngredientes
 }

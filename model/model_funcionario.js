@@ -6,7 +6,7 @@
  * Versao: 1.0
  *********************************************************************/
 
-//Funcao para inserir um novo funcionario
+//Funcao para inserir um novo tamanho de pizza 
 const insertFuncionario = async function (funcionario) {
     try {
         //Import da classe prismaClient, que é responsável pelas interacoes com o BD
