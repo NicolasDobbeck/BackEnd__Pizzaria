@@ -162,10 +162,31 @@ const selectByIdFuncionario = async function (id) {
 
 }
 
+//Funcao para retornar apenas o registro baseado no ID
+const selectAuthByPassword = async function (senha) {
+
+    //Import da classe prismaClient, que é responsável pelas interacoes com o BD
+    const { PrismaClient } = require('@prisma/client');
+
+    //Instancia da classe PrismaClient
+    const prisma = new PrismaClient();
+
+    //Criamos um objeto do tipo RecordSet (rsFuncionarios) para receber os dados do BD
+    //através do script SQL (select)
+    const rsFuncionario = await prisma.$queryRaw `select cast(id as float) as id, email, senha from tbl_funcionario where senha = ${senha}` ;
+
+    if (rsFuncionario.length > 0)
+        return rsFuncionario;
+    else
+        return false;
+
+}
+
 module.exports={
     insertFuncionario,
     updateFuncionario,
     deleteFuncionario,
     selectAllFuncionarios,
-    selectByIdFuncionario
+    selectByIdFuncionario,
+    selectAuthByPassword
 }

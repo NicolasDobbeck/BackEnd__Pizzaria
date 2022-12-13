@@ -45,6 +45,26 @@ const jsonParser = bodyParser.json()
 
 // ***************** // ---------- EndPoints de Funcionrio ---------- // *****************
 
+//Recebe o token
+const verifyJWT = async function (request, response, next){
+    //Recebe o token encaminhado no header da requisicao
+    let token = request.headers['x-acess-token']; 
+
+    console.log(token)
+    //Import da biblioteca para validacao do token 
+    const jwt = require('./authentication/jwt_funcionario.js');
+
+    const autenticidadeToken = await jwt.validateJWT(token)
+
+    if (autenticidadeToken) {
+        next();
+    }else{
+        return response.status(401).end();
+    }
+}
+
+
+
 // ---------- EndPoint para inserir novo funcionario ---------- //
 app.post('/v1/funcionario', cors(), jsonParser, async function (request, response) {
     let statusCode;
@@ -125,7 +145,7 @@ app.get('/v1/funcionario/:id', cors(), async function (request, response) {
 
 
 // ---------- EndPoint para listar todos os funcionarios existentes no BD---------- //
-app.get('/v1/funcionarios', cors(), async function (request, response) {
+app.get('/v1/funcionarios', verifyJWT, cors(), async function (request, response) {
 
     let statusCode;
     let message;

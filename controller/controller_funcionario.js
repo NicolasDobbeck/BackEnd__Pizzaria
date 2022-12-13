@@ -9,6 +9,26 @@
 //arquivo de mensagens padronizadas
 const { MESSAGE_ERROR, MESSAGE_SUCCESS } = require('../module/config.js');
 
+const autenticarFuncionario = async function (email, senha){
+    
+    //import da model 
+    const funcionario = require('../model/model_funcionario.js');
+    
+
+    // const dadosFuncionario = await funcionario.selectAuthByPassword(email, senha);
+
+    // if (dadosFuncionario) {
+    //     //Gera o token prlo JWT
+    //     let tokenFuncionario = await jwt.createJWT(dadosFuncionario.id);
+    //     //Adiciona uma chave no JSON com o token do usuario
+    //     dadosFuncionario.token = tokenFuncionario;
+    //     return dadosFuncionario
+    // }else{
+    //     return false
+    // }
+}
+
+
 //Funcao para gerar um novo aluno
 const novoFuncionario = async function (funcionario) {
 
@@ -24,8 +44,23 @@ const novoFuncionario = async function (funcionario) {
         //import da model de funcionario
         const novoFuncionario = require('../model/model_funcionario.js');
 
+        //import
+        const jwt = require ('../authentication/jwt_funcionario.js');
+
         //Chama a funcao para inserir novo funcionario
         const resultNovoFuncionario = await novoFuncionario.insertFuncionario(funcionario);
+
+        const dadosFuncionario = await novoFuncionario.selectAuthByPassword(senha);
+
+        if (dadosFuncionario) {
+            //Gera o token prlo JWT
+            let tokenFuncionario = await jwt.createJWT(dadosFuncionario.id);
+            //Adiciona uma chave no JSON com o token do usuario
+            dadosFuncionario.token = tokenFuncionario;
+            return dadosFuncionario
+        }else if(!dadosFuncionario){
+            return { status: 500, message: MESSAGE_ERROR.INTERNAL_ERROR_DB };
+        }
 
         //Verifica se os dados do novo funcionario foi inserido no BD
         if (resultNovoFuncionario) {
@@ -141,5 +176,6 @@ module.exports={
     atualizarFuncionario,
     excluirFuncionario,
     listarFuncionarios,
-    buscarFuncionario
+    buscarFuncionario,
+    autenticarFuncionario
 }
