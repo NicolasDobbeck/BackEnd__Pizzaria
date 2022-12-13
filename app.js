@@ -63,7 +63,25 @@ const verifyJWT = async function (request, response, next){
     }
 }
 
+app.post('/v1/funcionario/login',cors(), jsonParser, async function (request, response) {
+    const { email, senha } = request.body
+    const controller = require("./controller/controller_funcionario")
+    const login = await controller.autenticarFuncionario(email, senha)
+    let loginJSON = {};
+    
 
+    if(login){
+        loginJSON.login = login;
+        response.status(200)
+        response.json(loginJSON)
+        
+    }else{
+        response.status(400)
+    }
+
+    return loginJSON
+    
+})
 
 // ---------- EndPoint para inserir novo funcionario ---------- //
 app.post('/v1/funcionario', cors(), jsonParser, async function (request, response) {
